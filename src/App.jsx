@@ -45,7 +45,6 @@ export default function App() {
         return [...prevCart, { ...product, cartQuantity: quantity }];
       }
     });
-  console.log(`${product.name} added to cart!`);
   };
 
   const renderPage = () => {
@@ -54,7 +53,7 @@ export default function App() {
       case 'shop': return <Shop products={products} goToProduct={goToProduct} addToCart={addToCart} />;
       case 'product': return <ProductDetails product={selectedProduct} addToCart={addToCart} setPage={setPage} />;
       case 'about': return <About />;
-      case 'cart': return <Cart cart={cart} />
+      case 'cart': return <Cart cart={cart} setPage={setPage} />
       default: return <Home setPage={setPage} />;
     }
   };

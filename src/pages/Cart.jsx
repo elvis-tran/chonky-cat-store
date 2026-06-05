@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Cart({ cart }) {
+export default function Cart({ cart, setPage }) {
   // Calculate a simple total (assuming price is a string like "$24.99")
   const total = cart.reduce((sum, item) => {
     const priceNum = parseFloat(item.price.replace('$', ''));
@@ -13,7 +13,7 @@ export default function Cart({ cart }) {
         <h1>Your Shopping Cart</h1>
         
         {cart.length === 0 ? (
-          <p>Your cart is empty. Go back to the <a href="#" onClick={() => window.location.reload()}>Shop</a> to find some treats!</p>
+          <p>Your cart is empty. <button className="btn-link" onClick={() => setPage('shop')}>Go back to the Shop</button> to find some treats!</p>
         ) : (
           <div className="cart-list">
             {cart.map((item, index) => (

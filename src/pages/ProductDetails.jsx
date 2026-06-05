@@ -19,9 +19,6 @@ export default function ProductDetails({ product, addToCart, setPage }) {
       </button>
     </div>
   );
-  // Safety check: if product is null, prevent errors
-  if (!product) return <div className="container">Loading product details...</div>;
-
   return (
     <div className="page visible">
       <div className="container pdp-section">
