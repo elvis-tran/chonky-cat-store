@@ -1,10 +1,16 @@
 import React from 'react';
 import ProductCard from '../components/ProductCard';
 
-export default function Home({ setPage }) {
+export default function Home({ setPage, goToProduct, addToCart }) {
+  
+  // We define the products here so we can pass the full object to functions
+  const featured = [
+    { id: 1, name: 'Salmon Surprise', category: 'Dry Food', price: '$24.99', icon: '🐟', badge: 'BEST SELLER', badgeColor: 'gold', stars: '★★★★★', reviews: '128' },
+    { id: 2, name: 'Chicken Pillows', category: 'Treats', price: '$12.50', icon: '🍗', stars: '★★★★★', reviews: '85' }
+  ];
+
   return (
     <div className="home-page">
-      {/* 1. Hero Section */}
       <section className="hero">
         <div className="container">
           <h1>For the Cat Who Has Everything, <br />Except a Smaller Waistline.</h1>
@@ -13,33 +19,20 @@ export default function Home({ setPage }) {
         </div>
       </section>
 
-      {/* 2. Featured Products Section */}
       <section className="featured">
         <div className="container">
           <h2>Featured Delicacies</h2>
           <div className="product-grid">
-            <ProductCard 
-              badge="BEST SELLER" 
-              badgeColor="gold"
-              icon="🐟"
-              category="Dry Food"
-              name="Salmon Surprise"
-              tagline="High-protein bliss for the picky eater."
-              stars="★★★★★"
-              reviews="128"
-              price="$24.99"
-              onClick={() => setPage('product')}
-            />
-            <ProductCard 
-              icon="🍗"
-              category="Treats"
-              name="Chicken Pillows"
-              tagline="Crunchy outside, gooey inside."
-              stars="★★★★★"
-              reviews="85"
-              price="$12.50"
-              onClick={() => setPage('product')}
-            />
+            {featured.map((item) => (
+              <ProductCard 
+                key={item.id} 
+                {...item} 
+                // Navigate to details page
+                onClick={() => goToProduct(item)}
+                // Trigger add to cart
+                onAddToCart={() => addToCart(item, 1)}
+              />
+            ))}
           </div>
         </div>
       </section>

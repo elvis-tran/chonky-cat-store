@@ -10,10 +10,15 @@ export default function ProductCard({
   stars, 
   reviews, 
   price,
-  onClick 
+  onClick,
+  onAddToCart 
 }) {
+  const handleAddClick = (e) => {
+    e.stopPropagation(); 
+    onAddToCart();
+  };
   return (
-    <div className="product-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+    <div className="product-card" onClick={onClick} style={{ cursor: 'pointer' }}>
       
       {/* 1. Conditional Badge */}
       {badge && (
@@ -43,12 +48,8 @@ export default function ProductCard({
         
         {/* 4. Add to Cart Action */}
         <button 
-          className="add-btn" 
-          onClick={(e) => {
-            // This stops the click from bubbling up to the card itself
-            e.stopPropagation(); 
-            alert(`Added ${name} to cart! (We'll wire this to state later)`);
-          }}
+          className="add-btn"
+          onClick={handleAddClick} // Use our helper here
         >
           Add to Cart
         </button>

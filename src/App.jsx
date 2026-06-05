@@ -31,34 +31,27 @@ export default function App() {
   };
 
   const addToCart = (product, quantity) => {
-  // Create a new item object
-  const newItem = { ...product, cartQuantity: quantity };
-  // Update the cart state by spreading the existing cart + the new item
-  setCart([...cart, newItem]);
-  alert(`${product.name} added to cart!`);
-  };
+    setCart((prevCart) => {
+      // 1. Check if the product already exists in the cart
+      const existingItemIndex = prevCart.findIndex((item) => item.id === product.id);
 
-  // 2. RENDER LOGIC: Pass specific data to specific pages
-/*   const renderPage = () => {
-    switch (page) {
-      case 'home':
-        return <Home setPage={setPage} />;
-      case 'shop':
-        return <Shop products={products} goToProduct={goToProduct} />;
-      case 'product':
-        // We pass the specific product object to the details page
-        return <ProductDetails product={selectedProduct} cart={cart} setCart={setCart} />;
-      case 'about':
-        return <About />;
-      default:
-        return <Home setPage={setPage} />;
-    }
-  }; */
+      if (existingItemIndex !== -1) {
+        // 2. If it exists, update the quantity of the existing item
+        const newCart = [...prevCart];
+        newCart[existingItemIndex].cartQuantity += quantity;
+        return newCart;
+      } else {
+        // 3. If it's new, add it to the array
+        return [...prevCart, { ...product, cartQuantity: quantity }];
+      }
+    });
+  console.log(`${product.name} added to cart!`);
+  };
 
   const renderPage = () => {
     switch (page) {
-      case 'home': return <Home setPage={setPage} />;
-      case 'shop': return <Shop products={products} goToProduct={goToProduct} />;
+      case 'home': return <Home setPage={setPage} goToProduct={goToProduct} addToCart={addToCart} />;
+      case 'shop': return <Shop products={products} goToProduct={goToProduct} addToCart={addToCart} />;
       case 'product': return <ProductDetails product={selectedProduct} addToCart={addToCart} setPage={setPage} />;
       case 'about': return <About />;
       case 'cart': return <Cart cart={cart} />
