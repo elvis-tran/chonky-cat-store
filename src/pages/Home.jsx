@@ -1,41 +1,179 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 
-export default function Home({ setPage, goToProduct, addToCart }) {
-  
-  // We define the products here so we can pass the full object to functions
-  const featured = [
-    { id: 1, name: 'Salmon Surprise', category: 'Dry Food', price: '$24.99', icon: '🐟', badge: 'BEST SELLER', badgeColor: 'gold', stars: '★★★★★', reviews: '128' },
-    { id: 2, name: 'Chicken Pillows', category: 'Treats', price: '$12.50', icon: '🍗', stars: '★★★★★', reviews: '85' }
+export default function Home({ setPage, setSelectedCategory, addToCart, goToProduct }) {
+
+  const [featured, setFeatured] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/products.json')
+      .then(res => res.json())
+      .then(data => setFeatured(data.slice(0, 4)))
+      .catch(err => console.error('Failed to fetch products:', err));
+
+    fetch('/api/categories.json')
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(err => console.error('Failed to fetch categories:', err));
+  }, []);
+
+  const hallOfFame = [
+    { name: 'Sir Fluffington', owner: 'Margaret T.', icon: '😺', stars: '★★★★★' },
+    { name: 'Lord Butterscotch', owner: 'James W.', icon: '🐱', stars: '★★★★★' },
+    { name: 'Duchess Pudding', owner: 'Sarah K.', icon: '😸', stars: '★★★★★' },
+    { name: 'Baron Von Chonk', owner: 'Dave P.', icon: '🙀', stars: '★★★★★' }
   ];
 
+
+
   return (
-    <div className="home-page">
+    <>
+      {/* HERO */}
       <section className="hero">
-        <div className="container">
-          <h1>For the Cat Who Has Everything, <br />Except a Smaller Waistline.</h1>
-          <p>Premium, vet-approved, and absolutely delicious kibble for your fluffiest family members.</p>
-          <button className="cta-btn" onClick={() => setPage('shop')}>Shop the Chonky Collection</button>
+        <div className="hero-bg-ring"></div>
+        <div className="hero-deco-line"></div>
+        <div className="hero-inner container">
+          <div>
+            <div className="hero-badge">
+              <span>⭐ #1 Premium Cat Food Brand 2025</span>
+            </div>
+            <h1>Food For<br /><em>Distinguished</em><br />Chonks</h1>
+            <p className="hero-sub">Premium recipes crafted for cats who appreciate the finer things in life. Because every lap cat deserves a throne — and a full bowl.</p>
+            <div className="hero-cta">
+              <button className="btn-primary" onClick={() => setPage('products')}>Shop Dry Food</button>
+              <button className="btn-outline" onClick={() => setPage('products')}>Shop Wet Food</button>
+            </div>
+            <div className="hero-stats">
+              <div>
+                <div className="stat-num">12k+</div>
+                <div className="stat-lbl">Happy Chonks</div>
+              </div>
+              <div>
+                <div className="stat-num">4.9★</div>
+                <div className="stat-lbl">Average Rating</div>
+              </div>
+              <div>
+                <div className="stat-num">6</div>
+                <div className="stat-lbl">Premium Blends</div>
+              </div>
+            </div>
+          </div>
+          <div className="hero-image-wrap">
+            <div className="hero-image-frame">
+              <img src="/chonky-cat.png" alt="Chonky cat" style={{ maxWidth: '100%', height: 'auto' }} />
+            </div>
+            <div className="hero-image-badge">Extra Flavor. Extra Chonk.</div>
+          </div>
         </div>
       </section>
 
+      {/* TRUST BAR */}
+      <div className="trust-bar">
+        <div className="trust-inner">
+          <div className="trust-item">
+            <div className="trust-icon">🥣</div>
+            <div>
+              <div className="trust-title">Rich Flavors</div>
+              <div className="trust-desc">Every bite is a taste of luxury</div>
+            </div>
+          </div>
+          <div className="trust-item">
+            <div className="trust-icon">🐟</div>
+            <div>
+              <div className="trust-title">Premium Fish</div>
+              <div className="trust-desc">Real ingredients, no fillers</div>
+            </div>
+          </div>
+          <div className="trust-item">
+            <div className="trust-icon">👑</div>
+            <div>
+              <div className="trust-title">Luxury Cat Dining</div>
+              <div className="trust-desc">Approved by 9/10 lazy cats</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* FEATURED PRODUCTS */}
       <section className="featured">
         <div className="container">
-          <h2>Featured Delicacies</h2>
-          <div className="product-grid">
-            {featured.map((item) => (
-              <ProductCard 
-                key={item.id} 
-                {...item} 
-                // Navigate to details page
-                onClick={() => goToProduct(item)}
-                // Trigger add to cart
-                onAddToCart={() => addToCart(item, 1)}
+          <div className="section-header">
+            <span className="section-eyebrow">Chef's Selection</span>
+            <h2 className="section-title">Featured <em>Products</em></h2>
+            <div className="section-rule"></div>
+          </div>
+          <div className="products-grid">
+            {featured.map((product) => (
+              <ProductCard
+                key={product.id}
+                {...product}
+                onClick={() => goToProduct(product)}
+                onAddToCart={() => addToCart(product, 1)}
               />
             ))}
           </div>
         </div>
       </section>
-    </div>
+
+      {/* SHOP BY CATEGORY */}
+      <section className="categories">
+        <div className="container">
+          <div className="section-header">
+            <span className="section-eyebrow">The Menu</span>
+            <h2 className="section-title">Shop By <em>Category</em></h2>
+            <div className="section-rule"></div>
+          </div>
+          <div className="cat-grid">
+            {categories.map((cat, i) => (
+              <div key={i} className="cat-card" onClick={() => {
+                setSelectedCategory(cat.name);
+                setPage('products');
+              }}>
+                <div className="cat-icon">{cat.icon}</div>
+                <div className="cat-name">{cat.name}</div>
+                <div className="cat-count">{cat.count}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HALL OF FAME */}
+      <section className="hall-of-fame">
+        <div className="container">
+          <div className="section-header">
+            <span className="section-eyebrow">Our Community</span>
+            <h2 className="section-title">Chonky Hall <em>of Fame</em></h2>
+            <div className="section-rule"></div>
+          </div>
+          <div className="hof-grid">
+            {hallOfFame.map((cat, i) => (
+              <div key={i} className="hof-card">
+                <div className="hof-img">{cat.icon}</div>
+                <div className="hof-info">
+                  <div className="hof-catname">{cat.name}</div>
+                  <div className="hof-owner">Owner: {cat.owner}</div>
+                  <div className="hof-stars">{cat.stars}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* NEWSLETTER */}
+      <section className="newsletter">
+        <div className="container">
+          <h2>Get Exclusive <em>Chonk Deals</em></h2>
+          <p>New flavors, insider discounts, and chonky cat content delivered straight to your inbox.</p>
+          <div className="nl-form">
+            <input type="email" placeholder="youremail@example.com" />
+            <button>Subscribe</button>
+          </div>
+          <div className="nl-note">No spam. Only premium chonk content. Unsubscribe anytime.</div>
+        </div>
+      </section>
+    </>
   );
 }
