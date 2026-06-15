@@ -21,20 +21,64 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // Fetch products from dummy API
+  // Fetch products from AWS API Gateway
   useEffect(() => {
-    fetch('/api/products.json')
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch products:', err);
-        setLoading(false);
-      });
-  }, []);
+    const fetchProducts = async () => {
+      try {
+        const API_URL = 'https://jvf4xoz10l.execute-api.us-east-1.amazonaws.com/Prod/products';
+        const response = await fetch(API_URL, {
+          method: 'GET' 
+        });
 
+        if (!response.ok) {
+          throw new Error(`AWS API returned status: ${response.status}`);
+        }
+
+        const rawData = await response.json();
+        console.log('1. Raw API Gateway Response:', rawData);
+
+        let parsedData = rawData;
+
+        // Step 1: Unwrap Lambda Proxy Integration (if present)
+        if (rawData.body) {
+            parsedData = typeof rawData.body === 'string' 
+                ? JSON.parse(rawData.body) 
+                : rawData.body;
+            console.log('2. Unwrapped Lambda Body:', parsedData);
+        }
+
+        // Step 2: Extract the actual array for React
+        let finalProductsArray = [];
+
+        if (Array.isArray(parsedData)) {
+            // It's already a flat array
+            finalProductsArray = parsedData;
+        } else if (parsedData && Array.isArray(parsedData.Items)) {
+            // Standard AWS DynamoDB response structure
+            finalProductsArray = parsedData.Items;
+        } else if (parsedData && Array.isArray(parsedData.products)) {
+            // Common custom JSON wrapper
+            finalProductsArray = parsedData.products;
+        } else if (parsedData && Array.isArray(parsedData.data)) {
+            // Another common custom wrapper
+            finalProductsArray = parsedData.data;
+        } else {
+            console.warn('3. Could not locate an array in the response payload.', parsedData);
+        }
+
+        console.log('4. Final Array passed to React State:', finalProductsArray);
+        setProducts(finalProductsArray);
+
+      } catch (err) {
+        console.error('Failed to fetch products from AWS:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProducts();
+  }, []);
+  
   // Helper to "go to a product"
   const goToProduct = (product) => {
     setSelectedProduct(product);
