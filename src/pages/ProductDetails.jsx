@@ -28,7 +28,7 @@ export default function ProductDetails({ product, addToCart, setPage }) {
             <div className="pdp-gallery-main" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
               {product.imageKey ? (
                 <StorageImage 
-                  path={`public/${product.imageKey}`} 
+                  path={`img/${product.imageKey}`} 
                   alt={product.name}
                   style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain' }}
                 />

@@ -33,7 +33,7 @@ export default function ProductCard({
     <div className="product-img" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
         {imageKey ? (
           <StorageImage 
-            path={`public/${imageKey}`} 
+            path={`img/${imageKey}`} 
             alt={name}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
