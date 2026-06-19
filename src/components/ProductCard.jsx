@@ -3,7 +3,8 @@ import React from 'react';
 export default function ProductCard({ 
   badge, 
   badgeColor, 
-  icon, 
+  icon,
+  imageKey, 
   category, 
   name, 
   tagline, 
@@ -28,8 +29,18 @@ export default function ProductCard({
       )}
       
       {/* 2. Product Image/Icon */}
-      <div className="product-img">{icon}</div>
-      
+    <div className="product-img" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+        {imageKey ? (
+          <StorageImage 
+            path={`product-images/${imageKey}`} // 👈 Matches the path defined in your amplify/storage/resource.ts
+            alt={name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          // Graceful fallback to your original emoji system
+          <span style={{ fontSize: '3rem' }}>{icon}</span>
+        )}
+      </div>
       {/* 3. Product Details */}
       <div className="product-info">
         <div className="product-category">{category}</div>

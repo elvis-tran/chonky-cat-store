@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
+import { StorageImage } from '@aws-amplify/ui-react-storage';
 
-// Make sure you include 'addToCart' in the function signature props
 export default function ProductDetails({ product, addToCart, setPage }) {
-  // 1. Initialize State Hooks inside the component
   const [activeTab, setActiveTab] = useState('description');
   const [quantity, setQuantity] = useState(1);
 
-  // 2. Helper function to change quantity safely
   const handleQtyChange = (delta) => {
     setQuantity(prev => Math.max(1, prev + delta));
   };
-  // Update this to add a "Back" button
+
   if (!product) return (
     <div className="container" style={{ textAlign: 'center', padding: '50px' }}>
       <h2>No product selected!</h2>
@@ -19,6 +17,7 @@ export default function ProductDetails({ product, addToCart, setPage }) {
       </button>
     </div>
   );
+
   return (
     <div className="page visible">
       <div className="container pdp-section">
@@ -26,7 +25,17 @@ export default function ProductDetails({ product, addToCart, setPage }) {
           
           {/* GALLERY */}
           <div>
-            <div className="pdp-gallery-main">{product.icon}</div>
+            <div className="pdp-gallery-main" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+              {product.imageKey ? (
+                <StorageImage 
+                  path={`product-images/${product.imageKey}`} 
+                  alt={product.name}
+                  style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain' }}
+                />
+              ) : (
+                <span style={{ fontSize: '6rem' }}>{product.icon}</span>
+              )}
+            </div>
           </div>
 
           {/* INFO */}
@@ -40,13 +49,11 @@ export default function ProductDetails({ product, addToCart, setPage }) {
 
             <div className="pdp-qty-label">Quantity</div>
             <div className="pdp-qty">
-              {/* Correctly using the 'setQuantity' logic here */}
               <button className="qty-btn" onClick={() => handleQtyChange(-1)}>−</button>
               <input className="qty-num" type="number" value={quantity} readOnly />
               <button className="qty-btn" onClick={() => handleQtyChange(1)}>+</button>
             </div>
 
-            {/* Calling addToCart passed down from App.jsx */}
             <button 
                 className="btn-primary pdp-atc" 
                 onClick={() => addToCart(product, quantity)}
