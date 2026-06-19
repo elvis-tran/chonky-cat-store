@@ -3,8 +3,22 @@ import ProductCard from '../components/ProductCard';
 
 export default function Home({ setPage, setSelectedCategory, addToCart, goToProduct }) {
 
-  const [featured, setFeatured] = useState([]);
-  const [categories, setCategories] = useState([]);
+  // Create a randomized list of featured products
+  const featured = useMemo(() => {
+    // 1. Create a shallow copy of the products array
+    // 2. Sort it randomly using Math.random()
+    // 3. Take the first 4
+    return [...products]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 4);
+  }, [products]); // Re-run only if the 'products' array changes
+  const categories = [
+    { name: 'Dry Food', icon: '🥣', count: products.filter(p => p.category === 'Dry Food').length },
+    { name: 'Wet Food', icon: '🫙', count: products.filter(p => p.category === 'Wet Food').length },
+    { name: 'Treats', icon: '🐡', count: products.filter(p => p.category === 'Treats').length },
+    { name: 'Bundle', icon: '📦', count: products.filter(p => p.category === 'Bundle').length }
+  ];
+  
 
   useEffect(() => {
     fetch('/api/products.json')
@@ -24,8 +38,6 @@ export default function Home({ setPage, setSelectedCategory, addToCart, goToProd
     { name: 'Duchess Pudding', owner: 'Sarah K.', icon: '😸', stars: '★★★★★' },
     { name: 'Baron Von Chonk', owner: 'Dave P.', icon: '🙀', stars: '★★★★★' }
   ];
-
-
 
   return (
     <>
@@ -104,14 +116,16 @@ export default function Home({ setPage, setSelectedCategory, addToCart, goToProd
             <div className="section-rule"></div>
           </div>
           <div className="products-grid">
-            {featured.map((product) => (
-              <ProductCard
-                key={product.id}
-                {...product}
-                onClick={() => goToProduct(product)}
-                onAddToCart={() => addToCart(product, 1)}
-              />
-            ))}
+              {featured.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    {...product}
+                    // Apply the same imageKey fix we used in Shop.jsx
+                    imageKey={product.image_url ? product.image_url.replace('img/', '') : null}
+                    onClick={() => goToProduct(product)}
+                    onAddToCart={() => addToCart(product, 1)}
+                  />
+              ))}
           </div>
         </div>
       </section>

@@ -140,7 +140,7 @@ const goToProduct = (product) => {
       : products;
 
     switch (page) {
-      case 'home': return <Home setPage={setPage} setSelectedCategory={setSelectedCategory} goToProduct={goToProduct} addToCart={addToCart} />;
+      case 'home': return <Home products={products} setPage={setPage} setSelectedCategory={setSelectedCategory} goToProduct={goToProduct} addToCart={addToCart} />;
       case 'products': return <Shop products={displayProducts} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} goToProduct={goToProduct} addToCart={addToCart} />;
       case 'product': return <ProductDetails product={selectedProduct} addToCart={addToCart} setPage={setPage} />;
       case 'about': return <About />;
