@@ -56,14 +56,16 @@ export default function Shop({ products, selectedCategory, setSelectedCategory, 
         <div className="products-grid">
           {products.length > 0 ? (
             products.map((item) => (
-              <ProductCard 
-                key={item.id} 
-                {...item} 
-                onClick={() => goToProduct(item)}
-                onAddToCart={() => addToCart(item, 1)} 
-              />
+          <ProductCard 
+              key={item.id} 
+              {...item} 
+              // FIX: Map image_url to imageKey and strip the 'img/' folder prefix
+              imageKey={item.image_url ? item.image_url.replace('img/', '') : null}
+              onClick={() => goToProduct(item)}
+              onAddToCart={() => addToCart(item, 1)}
+            />
             ))
-          ) : (
+            ) : (
             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
               No products found in this category.
             </div>

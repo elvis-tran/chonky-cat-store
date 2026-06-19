@@ -87,10 +87,16 @@ export default function App() {
   }, []);
   
   // Helper to "go to a product"
-  const goToProduct = (product) => {
-    setSelectedProduct(product);
-    setPage('product');
+const goToProduct = (product) => {
+  // Normalize the product so ProductDetails gets the 'imageKey' ready to go
+  const normalizedProduct = {
+    ...product,
+    imageKey: product.image_url ? product.image_url.replace('img/', '') : null
   };
+  
+  setSelectedProduct(normalizedProduct);
+  setPage('product');
+};
 
   const addToCart = (product, quantity) => {
     setCart((prevCart) => {
