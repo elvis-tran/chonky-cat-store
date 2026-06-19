@@ -1,4 +1,5 @@
 import React from 'react';
+import { StorageImage } from '@aws-amplify/ui-react-storage';
 
 export default function ProductCard({ 
   badge, 
@@ -32,7 +33,7 @@ export default function ProductCard({
     <div className="product-img" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
         {imageKey ? (
           <StorageImage 
-            path={`product-images/${imageKey}`} // 👈 Matches the path defined in your amplify/storage/resource.ts
+            path={`public/${imageKey}`} 
             alt={name}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />

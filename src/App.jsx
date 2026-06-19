@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
+//AWS Amplify
+import { Amplify } from 'aws-amplify';
+import outputs from '../amplify_outputs.json';
+
+Amplify.configure(outputs);
+
 // Components
 import Announcement from './components/Announcement';
 import Header from './components/Header';
@@ -11,6 +17,7 @@ import Shop from './pages/Shop';
 import ProductDetails from './pages/ProductDetails';
 import About from './pages/About';
 import Cart from './pages/Cart';
+
 
 export default function App() {
   // 1. GLOBAL STATE: The source of truth for the app
@@ -132,6 +139,7 @@ export default function App() {
       case 'product': return <ProductDetails product={selectedProduct} addToCart={addToCart} setPage={setPage} />;
       case 'about': return <About />;
       case 'cart': return <Cart cart={cart} setPage={setPage} updateCartQuantity={updateCartQuantity} removeFromCart={removeFromCart} />
+      //case 'login': return; for login page
       default: return <Home setPage={setPage} />;
     }
   };
