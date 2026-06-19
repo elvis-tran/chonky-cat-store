@@ -1,36 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import ProductCard from '../components/ProductCard';
 
-export default function Home({ setPage, setSelectedCategory, addToCart, goToProduct }) {
+export default function Home({ products, setPage, setSelectedCategory, addToCart, goToProduct }) {
 
-  // Create a randomized list of featured products
+  // Create a randomized list of featured products from live AWS data
   const featured = useMemo(() => {
-    // 1. Create a shallow copy of the products array
-    // 2. Sort it randomly using Math.random()
-    // 3. Take the first 4
     return [...products]
       .sort(() => 0.5 - Math.random())
       .slice(0, 4);
-  }, [products]); // Re-run only if the 'products' array changes
+  }, [products]);
+
+  // Dynamically calculate inventory counts from live data
   const categories = [
     { name: 'Dry Food', icon: '🥣', count: products.filter(p => p.category === 'Dry Food').length },
     { name: 'Wet Food', icon: '🫙', count: products.filter(p => p.category === 'Wet Food').length },
     { name: 'Treats', icon: '🐡', count: products.filter(p => p.category === 'Treats').length },
     { name: 'Bundle', icon: '📦', count: products.filter(p => p.category === 'Bundle').length }
   ];
-  
-
-  useEffect(() => {
-    fetch('/api/products.json')
-      .then(res => res.json())
-      .then(data => setFeatured(data.slice(0, 4)))
-      .catch(err => console.error('Failed to fetch products:', err));
-
-    fetch('/api/categories.json')
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error('Failed to fetch categories:', err));
-  }, []);
 
   const hallOfFame = [
     { name: 'Sir Fluffington', owner: 'Margaret T.', icon: '😺', stars: '★★★★★' },
@@ -120,7 +106,6 @@ export default function Home({ setPage, setSelectedCategory, addToCart, goToProd
                   <ProductCard
                     key={product.id}
                     {...product}
-                    // Apply the same imageKey fix we used in Shop.jsx
                     imageKey={product.image_url ? product.image_url.replace('img/', '') : null}
                     onClick={() => goToProduct(product)}
                     onAddToCart={() => addToCart(product, 1)}

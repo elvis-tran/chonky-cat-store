@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
-//AWS Amplify
-import { Amplify } from 'aws-amplify';
-import outputs from '../amplify_outputs.json';
-
-Amplify.configure(outputs);
+import { Authenticator } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css'; 
 
 // Components
 import Announcement from './components/Announcement';
@@ -17,10 +13,10 @@ import Shop from './pages/Shop';
 import ProductDetails from './pages/ProductDetails';
 import About from './pages/About';
 import Cart from './pages/Cart';
-
+import Login from './pages/Login';
 
 export default function App() {
-  // 1. GLOBAL STATE: The source of truth for the app
+  // 1. GLOBAL STATE
   const [page, setPage] = useState('home');
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -42,38 +38,26 @@ export default function App() {
         }
 
         const rawData = await response.json();
-        console.log('1. Raw API Gateway Response:', rawData);
-
         let parsedData = rawData;
 
-        // Step 1: Unwrap Lambda Proxy Integration (if present)
         if (rawData.body) {
-            parsedData = typeof rawData.body === 'string' 
-                ? JSON.parse(rawData.body) 
-                : rawData.body;
-            console.log('2. Unwrapped Lambda Body:', parsedData);
+          parsedData = typeof rawData.body === 'string' 
+            ? JSON.parse(rawData.body) 
+            : rawData.body;
         }
 
-        // Step 2: Extract the actual array for React
         let finalProductsArray = [];
 
         if (Array.isArray(parsedData)) {
-            // It's already a flat array
-            finalProductsArray = parsedData;
+          finalProductsArray = parsedData;
         } else if (parsedData && Array.isArray(parsedData.Items)) {
-            // Standard AWS DynamoDB response structure
-            finalProductsArray = parsedData.Items;
+          finalProductsArray = parsedData.Items;
         } else if (parsedData && Array.isArray(parsedData.products)) {
-            // Common custom JSON wrapper
-            finalProductsArray = parsedData.products;
+          finalProductsArray = parsedData.products;
         } else if (parsedData && Array.isArray(parsedData.data)) {
-            // Another common custom wrapper
-            finalProductsArray = parsedData.data;
-        } else {
-            console.warn('3. Could not locate an array in the response payload.', parsedData);
+          finalProductsArray = parsedData.data;
         }
 
-        console.log('4. Final Array passed to React State:', finalProductsArray);
         setProducts(finalProductsArray);
 
       } catch (err) {
@@ -86,30 +70,23 @@ export default function App() {
     fetchProducts();
   }, []);
   
-  // Helper to "go to a product"
-const goToProduct = (product) => {
-  // Normalize the product so ProductDetails gets the 'imageKey' ready to go
-  const normalizedProduct = {
-    ...product,
-    imageKey: product.image_url ? product.image_url.replace('img/', '') : null
+  const goToProduct = (product) => {
+    const normalizedProduct = {
+      ...product,
+      imageKey: product.image_url ? product.image_url.replace('img/', '') : null
+    };
+    setSelectedProduct(normalizedProduct);
+    setPage('product');
   };
-  
-  setSelectedProduct(normalizedProduct);
-  setPage('product');
-};
 
   const addToCart = (product, quantity) => {
     setCart((prevCart) => {
-      // 1. Check if the product already exists in the cart
       const existingItemIndex = prevCart.findIndex((item) => item.id === product.id);
-
-      if (existingItemIndex !== -1) {
-        // 2. If it exists, update the quantity of the existing item
+      if (existingItemIndex != -1) {
         const newCart = [...prevCart];
         newCart[existingItemIndex].cartQuantity += quantity;
         return newCart;
       } else {
-        // 3. If it's new, add it to the array
         return [...prevCart, { ...product, cartQuantity: quantity }];
       }
     });
@@ -134,7 +111,6 @@ const goToProduct = (product) => {
   const renderPage = () => {
     if (loading && page === 'products') return <div style={{ padding: '60px 20px', textAlign: 'center' }}>Loading products...</div>;
     
-    // Filter products by category if one is selected
     const displayProducts = selectedCategory 
       ? products.filter((p) => p.category === selectedCategory)
       : products;
@@ -145,17 +121,17 @@ const goToProduct = (product) => {
       case 'product': return <ProductDetails product={selectedProduct} addToCart={addToCart} setPage={setPage} />;
       case 'about': return <About />;
       case 'cart': return <Cart cart={cart} setPage={setPage} updateCartQuantity={updateCartQuantity} removeFromCart={removeFromCart} />
-      //case 'login': return; for login page
+      case 'login': return <Login setPage={setPage} />;
       default: return <Home setPage={setPage} />;
     }
   };
 
   return (
-    <>
+    <Authenticator.Provider>
       <Announcement />
       <Header currentPage={page} setPage={setPage} cartCount={cart.length} />
       <main>{renderPage()}</main>
       <Footer />
-    </>
+    </Authenticator.Provider>
   );
 }

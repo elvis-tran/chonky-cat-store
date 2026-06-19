@@ -52,7 +52,7 @@ export default function Header({ currentPage, setPage, cartCount }) {
             </ul>
           </nav>
 
-          {/* Search & Cart Actions */}
+          {/* Search, Cart & Login Actions */}
           <div className="nav-actions">
             <div className="nav-search">
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -61,9 +61,19 @@ export default function Header({ currentPage, setPage, cartCount }) {
               </svg>
               <input type="text" placeholder="Search chonky foods…" />
             </div>
+
             <button className="cart-btn" onClick={() => setPage('cart')}>
               🛒 <span className="cart-label">Cart</span> <span className="cart-count">{cartCount}</span>
             </button>
+
+            {/* 🆕 Login button safely moved to the right of the Cart button */}
+            <button 
+              onClick={() => setPage('login')} 
+              className={`login-btn ${currentPage === 'login' ? 'active' : ''}`}
+            >
+              Login
+            </button>
+
             <button 
               className={`hamburger ${mobileNavOpen ? 'open' : ''}`}
               onClick={toggleMobileNav}
