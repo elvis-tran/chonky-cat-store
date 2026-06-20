@@ -877,3 +877,29 @@
     font-size: 0.8rem;
   }
 }
+
+/* Container for email and profile button alignment */
+.nav-profile-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Elegant, clean presentation for the active user's email */
+.nav-user-email {
+  color: #a1a1a6; /* Subtle text color so it doesn't fight with the main links */
+  font-size: 0.85rem;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Safely truncates massive emails gracefully */
+  border-right: 1px solid #3a3a3c; /* Adds a nice divider line before the Profile text */
+  padding-right: 12px;
+}
+
+/* Make sure the text vanishes if the screen gets too tight on mobile devices */
+@media (max-width: 768px) {
+  .nav-user-email {
+    display: none; 
+  }
+}
