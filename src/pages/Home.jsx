@@ -1,22 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import ProductCard from '../components/ProductCard';
 
-export default function Home({ setPage, setSelectedCategory, addToCart, goToProduct }) {
+export default function Home({ products, setPage, setSelectedCategory, addToCart, goToProduct }) {
 
-  const [featured, setFeatured] = useState([]);
-  const [categories, setCategories] = useState([]);
+  // Create a randomized list of featured products from live AWS data
+  const featured = useMemo(() => {
+    return [...products]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 4);
+  }, [products]);
 
-  useEffect(() => {
-    fetch('/api/products.json')
-      .then(res => res.json())
-      .then(data => setFeatured(data.slice(0, 4)))
-      .catch(err => console.error('Failed to fetch products:', err));
-
-    fetch('/api/categories.json')
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error('Failed to fetch categories:', err));
-  }, []);
+  // Dynamically calculate inventory counts from live data
+  const categories = [
+    { name: 'Dry Food', icon: '🥣', count: products.filter(p => p.category === 'Dry Food').length },
+    { name: 'Wet Food', icon: '🫙', count: products.filter(p => p.category === 'Wet Food').length },
+    { name: 'Treats', icon: '🐡', count: products.filter(p => p.category === 'Treats').length },
+    { name: 'Bundle', icon: '📦', count: products.filter(p => p.category === 'Bundle').length }
+  ];
 
   const hallOfFame = [
     { name: 'Sir Fluffington', owner: 'Margaret T.', icon: '😺', stars: '★★★★★' },
@@ -24,8 +24,6 @@ export default function Home({ setPage, setSelectedCategory, addToCart, goToProd
     { name: 'Duchess Pudding', owner: 'Sarah K.', icon: '😸', stars: '★★★★★' },
     { name: 'Baron Von Chonk', owner: 'Dave P.', icon: '🙀', stars: '★★★★★' }
   ];
-
-
 
   return (
     <>
@@ -104,14 +102,15 @@ export default function Home({ setPage, setSelectedCategory, addToCart, goToProd
             <div className="section-rule"></div>
           </div>
           <div className="products-grid">
-            {featured.map((product) => (
-              <ProductCard
-                key={product.id}
-                {...product}
-                onClick={() => goToProduct(product)}
-                onAddToCart={() => addToCart(product, 1)}
-              />
-            ))}
+              {featured.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    {...product}
+                    imageKey={product.image_url ? product.image_url.replace('img/', '') : null}
+                    onClick={() => goToProduct(product)}
+                    onAddToCart={() => addToCart(product, 1)}
+                  />
+              ))}
           </div>
         </div>
       </section>

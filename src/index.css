@@ -835,3 +835,71 @@
       .nav-actions { gap: 8px; }
       .nav-inner { padding: 12px 16px; gap: 8px; }
     }
+
+    /* Container to hold both buttons together */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Adjusts the breathing room between Login and Cart */
+}
+
+/* Premium minimalist styling for the header login button */
+.login-btn {
+  background: none;
+  border: none;
+  color: #F5F5F7; /* Matches your navigation link color */
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+/* Subtle gold glow when hovering over Login */
+.login-btn:hover {
+  color: #e0a93c; /* Matches your accent gold */
+}
+
+/* Gold highlight state if the user is currently looking at the login page */
+.login-btn.active {
+  color: #e0a93c;
+  font-weight: 600;
+}
+
+/* Mobile responsive tweak: Hide the text on very tiny screens if things get crowded */
+@media (max-width: 480px) {
+  .login-btn {
+    padding: 6px 6px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Container for email and profile button alignment */
+.nav-profile-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Elegant, clean presentation for the active user's email */
+.nav-user-email {
+  color: #a1a1a6; /* Subtle text color so it doesn't fight with the main links */
+  font-size: 0.85rem;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Safely truncates massive emails gracefully */
+  border-right: 1px solid #3a3a3c; /* Adds a nice divider line before the Profile text */
+  padding-right: 12px;
+}
+
+/* Make sure the text vanishes if the screen gets too tight on mobile devices */
+@media (max-width: 768px) {
+  .nav-user-email {
+    display: none; 
+  }
+}

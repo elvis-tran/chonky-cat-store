@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
 import NavDrawer from './NavDrawer';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 
 export default function Header({ currentPage, setPage, cartCount }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const toggleMobileNav = () => {
+  // 🆕 Monitor authentication state and fetch the logged-in user details
+  const { user, authStatus } = useAuthenticator((context) => [context.user, context.authStatus]);
+  const isLoggedIn = authStatus === 'authenticated';
+  const userEmail = user?.signInDetails?.loginId || user?.username;
+
+const toggleMobileNav = () => {
     setMobileNavOpen(!mobileNavOpen);
   };
 
@@ -52,7 +58,7 @@ export default function Header({ currentPage, setPage, cartCount }) {
             </ul>
           </nav>
 
-          {/* Search & Cart Actions */}
+          {/* Search, Cart & Account Actions */}
           <div className="nav-actions">
             <div className="nav-search">
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -61,9 +67,31 @@ export default function Header({ currentPage, setPage, cartCount }) {
               </svg>
               <input type="text" placeholder="Search chonky foods…" />
             </div>
+
             <button className="cart-btn" onClick={() => setPage('cart')}>
               🛒 <span className="cart-label">Cart</span> <span className="cart-count">{cartCount}</span>
             </button>
+
+            {/* 🆕 Dynamic Account Block: Changes based on login status */}
+            {isLoggedIn ? (
+              <div className="nav-profile-container">
+                <span className="nav-user-email">{userEmail}</span>
+                <button 
+                  onClick={() => setPage('profile')} 
+                  className={`login-btn ${currentPage === 'profile' ? 'active' : ''}`}
+                >
+                  Profile
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setPage('login')} 
+                className={`login-btn ${currentPage === 'login' ? 'active' : ''}`}
+              >
+                Login
+              </button>
+            )}
+
             <button 
               className={`hamburger ${mobileNavOpen ? 'open' : ''}`}
               onClick={toggleMobileNav}

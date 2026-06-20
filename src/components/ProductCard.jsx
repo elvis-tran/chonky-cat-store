@@ -1,9 +1,11 @@
 import React from 'react';
+import { StorageImage } from '@aws-amplify/ui-react-storage';
 
 export default function ProductCard({ 
   badge, 
   badgeColor, 
-  icon, 
+  icon,
+  imageKey, 
   category, 
   name, 
   tagline, 
@@ -28,19 +30,31 @@ export default function ProductCard({
       )}
       
       {/* 2. Product Image/Icon */}
-      <div className="product-img">{icon}</div>
-      
+    <div className="product-img" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+        {imageKey ? (
+          <StorageImage 
+            path={`img/${imageKey}`} 
+            alt={name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          // Graceful fallback to your original emoji system
+          <span style={{ fontSize: '3rem' }}>{icon}</span>
+        )}
+      </div>
       {/* 3. Product Details */}
       <div className="product-info">
         <div className="product-category">{category}</div>
         <div className="product-name">{name}</div>
         
         {/* Some cards on the shop page don't have a tagline, so we make it optional */}
-        {tagline && <div className="product-tagline">{tagline}</div>}
+        {!!tagline && <div className="product-tagline">{tagline}</div>}
         
-        <div className="product-stars">
-          {stars} <span className="product-reviews">({reviews})</span>
-        </div>
+        {(stars !== undefined || reviews !== undefined) && (
+            <div className="product-stars">
+              {stars} {reviews !== undefined && <span className="product-reviews">({reviews})</span>}
+            </div>
+        )}
         
         <div className="product-footer">
           <div className="product-price">{price}</div>
