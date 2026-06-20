@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 
 export default function Cart({ cart, setPage, updateCartQuantity, removeFromCart }) {
-  // 🆕 Local states for processing inventory verification
+  // Local states for processing inventory verification
   const [isValidating, setIsValidating] = useState(false);
   const [stockErrors, setStockErrors] = useState([]);
 
@@ -14,24 +14,24 @@ export default function Cart({ cart, setPage, updateCartQuantity, removeFromCart
     return sum + (priceNum * item.cartQuantity);
   }, 0);
 
-  // 🆕 Live validation handler targeting the backend endpoint
+  // Live validation handler targeting the backend endpoint
   const handleProceedToCheckout = async () => {
     setIsValidating(true);
     setStockErrors([]);
-
+    
     // Structure items to match backend property schema expectation
     const checkoutPayload = cart.map(item => ({
       productId: item.id,
-      title: item.name, // Matching the existing item.name property from your layout
-      requestedQuantity: item.cartQuantity // Matching your live state field name
+      title: item.name, 
+      requestedQuantity: item.cartQuantity 
     }));
 
     try {
-      const response = await fetch('/api/check-inventory', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: checkoutPayload })
-      });
+      const response = await fetch('https://jvf4xoz10l.execute-api.us-east-1.amazonaws.com/Prod/check-inventory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: checkoutPayload })
+    });
 
       const result = await response.json();
 
@@ -42,7 +42,7 @@ export default function Cart({ cart, setPage, updateCartQuantity, removeFromCart
       }
 
       // Success! Proceed smoothly to payment screen routing
-      setPage('checkout-payment'); 
+      setPage('checkout');
     } catch (error) {
       console.error("Inventory verification failed:", error);
       setStockErrors(["A network validation error occurred. Please try again."]);
@@ -86,10 +86,23 @@ export default function Cart({ cart, setPage, updateCartQuantity, removeFromCart
                   {cart.map((item, index) => (
                     <div key={item.id || index} className="cart-item-card">
                       <div className="item-image">{item.icon}</div>
+                      
                       <div className="item-details">
                         <div className="item-name">{item.name}</div>
                         <div className="item-category">{item.category}</div>
+                        
+                        {/* 🆕 Dynamic Inline Stock Alerts based on API current_stock */}
+                        {item.cartQuantity >= item.current_stock ? (
+                          <div style={{ color: '#e0a93c', fontSize: '0.75rem', marginTop: '5px', fontWeight: '600' }}>
+                            ⚠️ Max warehouse stock reached ({item.current_stock} available)
+                          </div>
+                        ) : item.current_stock <= 10 ? (
+                          <div style={{ color: '#ff6b6b', fontSize: '0.75rem', marginTop: '5px' }}>
+                            🔥 Only {item.current_stock} left in stock!
+                          </div>
+                        ) : null}
                       </div>
+
                       <div className="item-quantity">
                         <div className="qty-controls">
                           <button className="qty-btn" onClick={() => updateCartQuantity(item.id, item.cartQuantity - 1)}>−</button>
@@ -97,12 +110,30 @@ export default function Cart({ cart, setPage, updateCartQuantity, removeFromCart
                             type="number" 
                             className="qty-input" 
                             value={item.cartQuantity} 
-                            onChange={(e) => updateCartQuantity(item.id, parseInt(e.target.value) || 1)} 
-                            min="1" 
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 1;
+                              // Cap the manual input so it never bypasses current API stock
+                              const cappedVal = Math.min(val, item.current_stock);
+                              updateCartQuantity(item.id, cappedVal);
+                            }} 
+                            min="1"
+                            max={item.current_stock}
                           />
-                          <button className="qty-btn" onClick={() => updateCartQuantity(item.id, item.cartQuantity + 1)}>+</button>
+                          {/* 🆕 Lock button out immediately if quantity matches current stock */}
+                          <button 
+                            className="qty-btn" 
+                            onClick={() => updateCartQuantity(item.id, item.cartQuantity + 1)}
+                            disabled={item.cartQuantity >= item.current_stock}
+                            style={{ 
+                              opacity: item.cartQuantity >= item.current_stock ? 0.3 : 1,
+                              cursor: item.cartQuantity >= item.current_stock ? 'not-allowed' : 'pointer'
+                            }}
+                          >
+                            +
+                          </button>
                         </div>
                       </div>
+                      
                       <div className="item-price">
                         <div className="price-each">{item.price}</div>
                         <div className="price-total">
@@ -136,7 +167,7 @@ export default function Cart({ cart, setPage, updateCartQuantity, removeFromCart
                   )}
                 </div>
 
-                {/* 🆕 INVENTORY ERROR ALERTS INSERTED DIRECTLY ABOVE SUMMARY STATS */}
+                {/* INVENTORY ERROR ALERTS INSERTED DIRECTLY ABOVE SUMMARY STATS */}
                 {stockErrors.length > 0 && (
                   <div className="stock-error-notice" style={{
                     backgroundColor: '#fdf2f2',
@@ -171,7 +202,7 @@ export default function Cart({ cart, setPage, updateCartQuantity, removeFromCart
                   <span>${(total * 1.08).toFixed(2)}</span>
                 </div>
 
-                {/* 🆕 Interactive button state handlers mapped smoothly over existing style profiles */}
+                {/* Interactive button state handlers mapped smoothly over existing style profiles */}
                 <button 
                   className="btn-primary" 
                   onClick={handleProceedToCheckout}

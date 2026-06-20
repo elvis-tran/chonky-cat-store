@@ -48,11 +48,13 @@ export default function ProductCard({
         <div className="product-name">{name}</div>
         
         {/* Some cards on the shop page don't have a tagline, so we make it optional */}
-        {tagline && <div className="product-tagline">{tagline}</div>}
+        {!!tagline && <div className="product-tagline">{tagline}</div>}
         
-        <div className="product-stars">
-          {stars} <span className="product-reviews">({reviews})</span>
-        </div>
+        {(stars !== undefined || reviews !== undefined) && (
+            <div className="product-stars">
+              {stars} {reviews !== undefined && <span className="product-reviews">({reviews})</span>}
+            </div>
+        )}
         
         <div className="product-footer">
           <div className="product-price">{price}</div>
